@@ -10,36 +10,27 @@ import { GifMapper } from '../mapper/gif.mapper';
 const GIF_KEY = 'gifs';
 
 const loadFromLocalStorage = () => {
-  const gifsFromLocalStorage = localStorage.getItem(GIF_KEY) ?? '{}'; //Record<string, gifs[]>
+  const gifsFromLocalStorage = localStorage.getItem(GIF_KEY) ?? '{}';
   const gifs = JSON.parse(gifsFromLocalStorage);
 
   return gifs;
 };
 
-// {
-//   'goku': [gif1,gif2,gif3],
-//   'saitama': [gif1,gif2,gif3],
-//   'dragon ball': [gif1,gif2,gif3],
-// }
-
-// Record<string, Gif[]>
-
 @Injectable({ providedIn: 'root' })
 export class GifService {
   private http = inject(HttpClient);
 
-  trendingGifs = signal<Gif[]>([]); //[gif,gif,gif,gif,gif,gif,]
+  trendingGifs = signal<Gif[]>([]);
   trendingGifsLoading = signal(false);
   private trendingPage = signal(0);
 
-  // [ [gif,gif,gif,], [gif,gif,gif,],[gif,gif,gif,],[gif,gif,gif,] ]
   trendingGifGroup = computed<Gif[][]>(() => {
     const groups = [];
     for (let i = 0; i < this.trendingGifs().length; i += 3) {
       groups.push(this.trendingGifs().slice(i, i + 3));
     }
 
-    return groups; //[ [g1,g2,g3],[g4,g5]]
+    return groups;
   });
 
   searchHistory = signal<Record<string, Gif[]>>(loadFromLocalStorage());
@@ -97,13 +88,6 @@ export class GifService {
           }));
         })
       );
-
-    // .subscribe((resp) => {
-    //   const gifs = GifMapper.mapGiphyItemsToGifArray(resp.data);
-
-    //   console.log({ search: gifs });
-    //   return gifs;
-    // });
   }
 
   getHistoryGifs(query: string): Gif[] {
